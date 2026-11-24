@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Test Behavior, Not Implementation
 
-In Hermes, read [the pstacky adapter](references/pstacky-adapter.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
+In Hermes, read [the pstacky adapter](../../docs/harness/hermes.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
 
 A test is a claim about what users of the code can observe through its interface: return values, errors, state they can read back, and effects on outside systems. Private helpers, internal call order, and intermediate data are implementation.
 

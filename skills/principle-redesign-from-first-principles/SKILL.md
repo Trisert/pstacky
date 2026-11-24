@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Redesign From First Principles
 
-In Hermes, read [the pstacky adapter](references/pstacky-adapter.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
+In Hermes, read [the pstacky adapter](../../docs/harness/hermes.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
 
 When integrating a change, don't bolt it onto the existing design. Redesign as if the requirement had been a foundational assumption from the start.
 

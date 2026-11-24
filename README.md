@@ -24,8 +24,8 @@ Skills land in the plugin namespace: `/pstacky:poteto-mode`,
   reproducing run.
 - `/pstacky:deslop` removes AI slop from the current diff before a commit.
 
-A skill reads `references/pstacky-adapter.md` once per session. That file is
-generated from `docs/harness/hermes.md` into every skill.
+A skill reads `../../docs/harness/hermes.md` once per session. That file is the
+single adapter for the whole package.
 
 ## Models
 
@@ -54,7 +54,8 @@ the first heading (or after frontmatter when a skill has no heading).
 
 ```
 plugin.json            manifest (agent-plugins v1)
-skills/<name>/         upstream skill + references/pstacky-adapter.md
+skills/<name>/         upstream skill, one adapter line
+skills/<name>/references/agents/  only the agent that skill spawns
 skills/deslop/         companion skill, no adapter line
 agents/                poteto-agent.md, comment-sicko.md
 docs/harness/hermes.md adapter source of truth

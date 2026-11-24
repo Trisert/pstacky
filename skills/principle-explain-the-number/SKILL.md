@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Explain the Number
 
-In Hermes, read [the pstacky adapter](references/pstacky-adapter.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
+In Hermes, read [the pstacky adapter](../../docs/harness/hermes.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
 
 - **Write the decision before you run.** Name the result that would change it, and the noise floor. Stop when the run-to-run spread is larger than the effect.
 - **Ask "why not double?"** Name the resource or code path that bounds the result, from a profile or counters taken during a run. A guess from reading the code is not a limiter.

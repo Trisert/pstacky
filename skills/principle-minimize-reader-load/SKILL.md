@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Minimize Reader Load
 
-In Hermes, read [the pstacky adapter](references/pstacky-adapter.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
+In Hermes, read [the pstacky adapter](../../docs/harness/hermes.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
 
 Reader load is the work a reader must do to understand code. It has two independent axes: layers to trace between the question and the answer, and hidden or mutable state to hold in their head. Guard both.
 

@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Migrate Callers Then Delete Legacy APIs
 
-In Hermes, read [the pstacky adapter](references/pstacky-adapter.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
+In Hermes, read [the pstacky adapter](../../docs/harness/hermes.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
 
 - Update tests to assert the new contract, and delete tests that only protect pre-refactor implementation details
 

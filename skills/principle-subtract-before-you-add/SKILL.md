@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Subtract Before You Add
 
-In Hermes, read [the pstacky adapter](references/pstacky-adapter.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
+In Hermes, read [the pstacky adapter](../../docs/harness/hermes.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
 
 When evolving a system, remove complexity first, then build. Default to subtraction.
 

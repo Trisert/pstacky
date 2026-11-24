@@ -33,9 +33,8 @@ DESCRIPTION = (
     "Cursor-to-Hermes adapter that works single-model or routed, and deslop."
 )
 
-ADAPTER_REL = "references/pstacky-adapter.md"
 ADAPTER_LINE = (
-    "In Hermes, read [the pstacky adapter](references/pstacky-adapter.md) once "
+    "In Hermes, read [the pstacky adapter](../../docs/harness/hermes.md) once "
     "per session before you follow this file. It maps the Cursor names in pstack "
     "to Hermes tools."
 )
@@ -123,7 +122,7 @@ def rewrite_escaping_links(pkg: Build, pin: dict[str, str], upstream: Path) -> N
     """Relative links that resolve outside the package point at the pinned GitHub tree."""
     sha = pin["sha"]
     for rel in sorted(pkg.files):
-        if not rel.endswith(".md") or rel.endswith(ADAPTER_REL):
+        if not rel.endswith(".md"):
             continue
         text = pkg.files[rel].decode("utf-8", "replace")
         changed = False
@@ -135,8 +134,11 @@ def rewrite_escaping_links(pkg: Build, pin: dict[str, str], upstream: Path) -> N
             if target.startswith(("#", "http://", "https://", "mailto:")):
                 return match.group(0)
             resolved = posixpath.normpath(posixpath.join(posixpath.dirname(rel), target))
-            if resolved in pkg.files or any(
-                f.startswith(resolved + "/") for f in pkg.files
+            if (
+                resolved in pkg.files
+                or any(f.startswith(resolved + "/") for f in pkg.files)
+                or (ROOT / resolved).is_file()
+                or (ROOT / resolved).is_dir()
             ):
                 return match.group(0)
             candidate = upstream / resolved
@@ -174,7 +176,6 @@ def build() -> Build:
             if path.name == "SKILL.md":
                 data = insert_adapter_line(data.decode(), f"skills/{name}/SKILL.md").encode()
             build_.add(rel, data)
-        build_.add(f"skills/{name}/{ADAPTER_REL}", adapter.encode())
         agent = AGENT_FOR_SKILL.get(name)
         if agent:
             build_.add(
@@ -188,7 +189,7 @@ def build() -> Build:
         raise SystemExit(f"generate: {DESLOP_PATH}/SKILL.md missing from the vendor checkout")
     build_.add("skills/deslop/SKILL.md", (deslop / "SKILL.md").read_bytes())
 
-    # 3. agents and guide
+    # 3. agents and guide (the adapter is source, not generated)
     for path in sorted((upstream / "agents").glob("*.md")):
         build_.add(f"agents/{path.name}", path.read_bytes())
     copy_tree(build_, upstream / "docs" / "guide", "docs/guide")
@@ -215,7 +216,7 @@ def build() -> Build:
 
     # 5. links, then the guard for unmapped Cursor terms
     for rel in list(build_.files):
-        if rel.endswith(".md") and not rel.endswith(ADAPTER_REL):
+        if rel.endswith(".md"):
             build_.files[rel] = pin_github_links(
                 build_.files[rel].decode("utf-8", "replace"), pin["sha"]
             ).encode()

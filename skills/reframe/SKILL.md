@@ -4,7 +4,7 @@ description: "Teach the expert words for what the operator is building, borrow w
 disable-model-invocation: true
 ---
 
-In Hermes, read [the pstacky adapter](references/pstacky-adapter.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
+In Hermes, read [the pstacky adapter](../../docs/harness/hermes.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
 
 Teach the operator the expert words for what they are building. Start from their own files, code and description, not a summary.
 

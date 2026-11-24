@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Guard the Context Window
 
-In Hermes, read [the pstacky adapter](references/pstacky-adapter.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
+In Hermes, read [the pstacky adapter](../../docs/harness/hermes.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
 
 **Why:** Context overflow degrades reasoning quality, creates compression artifacts, and halts progress.
 

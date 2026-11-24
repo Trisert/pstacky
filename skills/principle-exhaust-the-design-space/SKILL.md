@@ -6,6 +6,6 @@ disable-model-invocation: true
 
 # Exhaust the Design Space
 
-In Hermes, read [the pstacky adapter](references/pstacky-adapter.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
+In Hermes, read [the pstacky adapter](../../docs/harness/hermes.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
 
 It also applies to product design decisions where user experience depends on feel, not logic.

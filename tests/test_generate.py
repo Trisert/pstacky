@@ -62,8 +62,8 @@ class BuildTests(unittest.TestCase):
         self.assertNotIn("skills/make-bot-ui/SKILL.md", self.build.files)
         self.assertIn("skills/deslop/SKILL.md", self.build.files)
         self.assertEqual(
-            len([r for r in self.build.files if r.endswith("references/pstacky-adapter.md")]),
-            58,
+            len([r for r in self.build.files if r.endswith("pstacky-adapter.md")]),
+            0,
         )
 
     def test_deslop_untouched(self) -> None:

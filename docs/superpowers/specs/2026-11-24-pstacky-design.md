@@ -56,7 +56,6 @@ UPSTREAM_PIN                    sha + upstream version
 README.md                       install, modes, update
 LICENSE                         MIT
 skills/<58 upstream>/           SKILL.md + upstream references/scripts
-  references/pstacky-adapter.md copied adapter (one per skill)
   references/agents/<agent>.md  only the agents that skill spawns
 skills/deslop/SKILL.md          cursor-team-kit, byte-for-byte, no adapter line
 agents/poteto-agent.md          upstream copy
@@ -131,8 +130,9 @@ always valid; single-model mode writes only the budget line. Idempotent.
 ## Validation (`tools/validate.py`)
 
 - 59 skills; `name:` unique, kebab-case, matches directory.
-- Every upstream skill has exactly one adapter line and its adapter copy; `deslop`
-  has neither.
+- Every upstream skill has exactly one adapter line that resolves to
+  `docs/harness/hermes.md`; `deslop` has neither. One shared adapter, not a copy
+  per skill: 59 copies tripped the install scanner 158 times.
 - Every `TERMS` entry used in a skill has a row in the adapter.
 - No `{{`, `TODO`, `FIXME` placeholders in generated files.
 - No relative link escapes the skill directory; no absolute host paths.

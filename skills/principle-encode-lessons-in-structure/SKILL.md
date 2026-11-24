@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Encode Lessons in Structure
 
-In Hermes, read [the pstacky adapter](references/pstacky-adapter.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
+In Hermes, read [the pstacky adapter](../../docs/harness/hermes.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
 
 If the lesson needs judgment and cannot be encoded, make the instruction more prominent and add an example of the failure mode.
 

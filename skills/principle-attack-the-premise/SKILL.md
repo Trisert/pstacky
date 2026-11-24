@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Attack the Premise
 
-In Hermes, read [the pstacky adapter](references/pstacky-adapter.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
+In Hermes, read [the pstacky adapter](../../docs/harness/hermes.md) once per session before you follow this file. It maps the Cursor names in pstack to Hermes tools.
 
 When two or more fixes that share one premise have failed the same gate, suspect the premise, not the fixes.
 

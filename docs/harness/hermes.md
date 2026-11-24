@@ -119,7 +119,7 @@ Panels larger than `delegation.max_concurrent_children` run in batches.
 | `~/.cursor/skills/`, user skill | `~/.hermes/skills/<category>/<name>/` through `skill_manage`. |
 | `~/.cursor/plugins/`, `.cursor-plugin/plugin.json` | `<pstacky>`; the version is in `<pstacky>/plugin.json`. |
 | `.cursor/rules/*.mdc`, the `pstack-models.mdc` rule | `~/.hermes/pstack-models.md` for the model roles; repo rules go in `AGENTS.md`. Hermes never reads `.mdc`. |
-| `https://github.com/cursor/plugins/blob/main/pstack/<path>` | The local copy under `<pstacky>/<path>` when it exists; read it, do not fetch it. |
+| `https://github.com/cursor/plugins/blob/ca782ed8b3c2c521cead8e1720d55c3a5dbf2347/pstack/<path>` | The local copy under `<pstacky>/<path>` when it exists; read it, do not fetch it. |
 | Agent transcripts | `session_search`; raw files are under `~/.hermes/sessions/` and `state.db`. Subagent transcripts are the paths `delegate_task` returns. |
 | `/loop` | Iterate inside this turn while the check still moves. Longer: `cronjob_manage` after asking the user. |
 

@@ -11,9 +11,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 ADAPTER = "docs/harness/hermes.md"
-ADAPTER_REL = "references/pstacky-adapter.md"
 ADAPTER_LINE = (
-    "In Hermes, read [the pstacky adapter](references/pstacky-adapter.md) once "
+    "In Hermes, read [the pstacky adapter](../../docs/harness/hermes.md) once "
     "per session before you follow this file. It maps the Cursor names in pstack "
     "to Hermes tools."
 )
@@ -105,19 +104,14 @@ def validate(root: Path = ROOT) -> list[str]:
             problems.append(f"{name}: frontmatter has no description")
 
         has_line = ADAPTER_LINE in text
-        has_copy = (skill / ADAPTER_REL).is_file()
         if name == DESLOP:
-            if has_line or has_copy:
-                problems.append("deslop must not carry the adapter line or copy")
+            if has_line:
+                problems.append("deslop must not carry the adapter line")
             continue
         if not has_line:
             problems.append(f"{name}: missing adapter line")
         if text.count(ADAPTER_LINE) != 1:
             problems.append(f"{name}: adapter line appears {text.count(ADAPTER_LINE)} times")
-        if not has_copy:
-            problems.append(f"{name}: missing {ADAPTER_REL}")
-        elif (skill / ADAPTER_REL).read_text() != adapter:
-            problems.append(f"{name}: adapter copy differs from {ADAPTER}")
 
     # TERMS: every term used in a skill has a row in the adapter
     sys.path.insert(0, str(root / "tools"))
