@@ -1,0 +1,26 @@
+# NOTICE
+
+pstacky is a Hermes Agent package of pstack, the agent method by Lauren Tan.
+
+## Upstream
+
+- Project: pstack
+- Repository: https://github.com/cursor/plugins
+- Path: `pstack/`
+- Version: 0.15.48
+- Author: Lauren Tan
+- Licence: MIT, Copyright (c) 2026 Lauren Tan (see `LICENSE`)
+
+## Companion skill
+
+- `deslop`, from `cursor-team-kit/skills/deslop/` at the same commit
+- Licence: MIT, Copyright (c) 2026 Lauren Tan
+
+## What pstacky adds
+
+- `docs/harness/hermes.md`: the Cursor-to-Hermes adapter (original text).
+- `tools/`: generator and validator (original code).
+- `plugin.json` and this packaging.
+
+Skill text is upstream, byte for byte, with one adapter line appended after
+the first heading of every upstream skill.

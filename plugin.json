@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "pstacky",
+  "version": "0.1.0",
+  "description": "pstack for Hermes Agent, 1:1: every upstream skill byte for byte, a Cursor-to-Hermes adapter that works single-model or routed, and deslop.",
+  "author": {
+    "name": "Nicola Destro"
+  },
+  "license": "MIT",
+  "keywords": [
+    "pstack",
+    "poteto-mode",
+    "hermes",
+    "skills",
+    "workflow",
+    "delegation",
+    "verification"
+  ]
+}

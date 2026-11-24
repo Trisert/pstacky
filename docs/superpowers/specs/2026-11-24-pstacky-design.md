@@ -21,7 +21,8 @@ shipped outside pstack in `cursor-team-kit`).
 
 ## Goals
 
-1. Ship pstack 1:1: every upstream skill, byte-for-byte, plus one adapter line.
+1. Ship pstack 1:1: every upstream skill except `make-bot-ui` (its `curl | sudo
+   sh` Tailscale step trips the plugin install scanner), plus one adapter line.
 2. Work in both delegation modes: single-model (no `option` in `delegate_task`)
    and routed (`delegation.backend: model_map`, `option` enum), with arbitrary
    route names — not only `<vendored-family>-<effort>`.
@@ -54,7 +55,7 @@ NOTICE                          attribution + pin
 UPSTREAM_PIN                    sha + upstream version
 README.md                       install, modes, update
 LICENSE                         MIT
-skills/<59 upstream>/           SKILL.md + upstream references/scripts
+skills/<58 upstream>/           SKILL.md + upstream references/scripts
   references/pstacky-adapter.md copied adapter (one per skill)
   references/agents/<agent>.md  only the agents that skill spawns
 skills/deslop/SKILL.md          cursor-team-kit, byte-for-byte, no adapter line
@@ -129,7 +130,7 @@ always valid; single-model mode writes only the budget line. Idempotent.
 
 ## Validation (`tools/validate.py`)
 
-- 60 skills; `name:` unique, kebab-case, matches directory.
+- 59 skills; `name:` unique, kebab-case, matches directory.
 - Every upstream skill has exactly one adapter line and its adapter copy; `deslop`
   has neither.
 - Every `TERMS` entry used in a skill has a row in the adapter.
@@ -142,10 +143,10 @@ always valid; single-model mode writes only the budget line. Idempotent.
 
 - Unit: generator pure functions (adapter injection, link rewrite, TERMS scan),
   determinism, `--check` catches a one-byte edit.
-- Integration: full build against the pinned clone in a temp dir; validate.
+- Integration: full build against the pinned clone; validate on the resulting tree.
 - Smoke (local, needs Hermes): install into a temp `HERMES_HOME`, enable,
   `plugins doctor`, assert `/pstacky:poteto-mode` resolves.
-- CI: ruff, pytest, `generate.py --check`, `validate.py`. No network beyond
+- CI: ruff, `unittest`, `generate.py --check`, `validate.py`. No network beyond
   fetching the pinned repo.
 
 ## Rollout
@@ -182,3 +183,4 @@ always valid; single-model mode writes only the budget line. Idempotent.
 | Companion skills | `deslop` included; `control-ui`/`control-cli` excluded |
 | Routes | generic: no hardcoded models; setup reads the live enum |
 | Build | committed, reproducible, `--check` in CI |
+| Excluded skill | `make-bot-ui` only: install scanner flags `curl \| sudo sh` |
