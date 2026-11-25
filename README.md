@@ -88,9 +88,10 @@ equivalents you have. Some examples, not recommendations:
    what it is good at. Name a route after the model it runs, then its effort
    (`deepseek-xhigh`, `kimi-high`, `sol-high`). Give two different models two
    different names, not the same family with different efforts.
-3. A new session, then `/pstacky:setup-pstack`. For every role that has no
-   choice yet it suggests one of your routes, based on the descriptions, and
-   you confirm or change each one. The role file is written only with your
+3. A new session, then `/pstacky:setup-pstack`. For every role still on
+   `inherit-parent` it suggests one of your routes, based on the descriptions;
+   for a panel (arena runners, interrogate reviewers) it suggests a different
+   route per seat when you have enough. You confirm or change each one. The role file is written only with your
    yes. setup-pstack can do steps 1 and 2 for you if you ask.
 
 You do not need Claude or Gemini. Only if you already run them: a route named
@@ -101,8 +102,11 @@ default roles on its own, and you still confirm the table. Never name a route
 The playbooks and agent files also name Claude models as defaults
 (`claude-opus-5-5-xhigh-fast` for code work, for example). They read your role
 line first, so a role in `pstack-models.md` always wins. A step with no role
-line, such as eval's dispatcher or poteto-agent's own default, runs on the model
-map's `default` route, else the chat model. Point `default` at your main worker.
+line, such as eval's dispatcher or poteto-agent's own default, keeps its Claude
+default: it runs on a route of that family if you have one (`opus-medium` for
+eval's dispatcher), else on the model map's `default` route, else on
+`delegation.model` or the chat model. Without Claude routes, point `default` at
+your main worker.
 
 ### How setup-pstack decides
 
@@ -112,7 +116,7 @@ flowchart TD
     B -- yes --> C["Read pstack-models.md<br/>as current choices"]
     C --> D["Ask the budget"]
     D --> E["Map defaults:<br/>opus / fable / gemini routes map on their own"]
-    E --> F["Suggest one of your routes<br/>for each role with no choice yet"]
+    E --> F["Suggest your routes for roles<br/>still on inherit-parent;<br/>a different route per panel seat"]
     F --> G{"You confirm<br/>or change roles"}
     G --> H["Write pstack-models.md"]
     H --> Z["Applies to new sessions"]
