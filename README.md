@@ -37,24 +37,66 @@ single adapter for the whole package.
 
 ## Models
 
-**Single-model (default).** `delegate_task` has no `option`, so every child runs
-on `delegation.model`. Panels fan out N children on one model with distinct
-framings, and the cross-vendor judge is skipped and reported.
+pstacky ships no model ids. Every model is your choice, and you can change it at
+any time.
 
-**Routed.** With `advanced-delegation` and `delegation.backend: model_map`,
-`delegate_task` gains an `option` enum. pstacky maps each pstack role to a route
-name. Names are arbitrary; `<family>-<effort>` (`opus-xhigh`, `deepseek-high`) is
-only a convention. A role whose family has no route becomes `inherit-parent`.
-`/pstacky:setup-pstack` writes the role file to `$HERMES_HOME/pstack-models.md`
-(`~/.hermes` without a profile).
+### How it works
 
-pstacky ships no model ids, and `setup-pstack` never creates routes on its own.
-To add them: `hermes plugins install advanced-delegation --enable`, then
-`hermes delegation config` (mode Model routes) in a shell, then a new session and
-`/pstacky:setup-pstack`. Name routes `<family>-<effort>` so pstack's defaults map
-on their own; pstack's defaults name only Anthropic and Google families, so with
-other families `setup-pstack` suggests a route per role and writes it only when
-you accept. `setup-pstack` can do the first two steps for you if you say yes.
+pstack's skills spawn subagents by role (`bug-fix`, `arena runners`,
+`interrogate reviewers`, ...). Each role runs on a **route** you define, or on
+the chat's own model (`inherit-parent`).
+
+- **Routes** live in your Hermes config, under `advanced-delegation`'s model
+  map: a name, a one-line description, a provider and a model.
+- **Roles** live in `$HERMES_HOME/pstack-models.md` (`~/.hermes` without a
+  profile): one line per role, each value a route name or `inherit-parent`.
+
+Without routes, every role runs on the chat model. Panels still fan out N
+subagents with different framings, and the cross-vendor judge is skipped.
+
+### Upstream defaults, and what to pick instead
+
+pstack (Cursor) ships three models, each with a job:
+
+| Job | Upstream default | Roles |
+| --- | --- | --- |
+| Main worker | Claude Opus 5.5 | feature, bug-fix, perf, hillclimb, judgment, swarm |
+| Second opinion | Claude Fable 5.2 | one panel seat in arena and interrogate |
+| Another vendor | Gemini 4 Neon | one panel seat, and the arena judge |
+
+The model names matter less than the jobs: panels want different points of view,
+and the judge must come from a different vendor than the chat model. Pick the
+equivalents you have. Some examples, not recommendations:
+
+| Provider | Main worker | Second opinion | Another vendor |
+| --- | --- | --- | --- |
+| Anthropic + Google | Opus | Fable | Gemini |
+| ChatGPT / Codex only | a GPT "sol" model | a GPT "astra" model | none: the judge is skipped |
+| OpenCode Go | DeepSeek V4.1 Flash | Kimi K3.1 Pro | Gemini, GLM, Qwen, ... |
+
+### Set it up
+
+1. `hermes plugins install advanced-delegation --enable`.
+2. `hermes delegation config` in a shell, mode Model routes. Add one route per
+   model, cheapest first, each with a one-line description of what it is good
+   at. `<family>-<effort>` names (`deepseek-xhigh`, `kimi-high`) let pstack's
+   defaults map on their own; give two different models two different names,
+   not the same family with different efforts.
+3. A new session, then `/pstacky:setup-pstack`. It maps the defaults, suggests a
+   route for every role left on `inherit-parent`, and writes the role file only
+   with your yes. It can do steps 1 and 2 for you if you ask.
+
+### Change a model later
+
+- **Same role, different model:** point the route at the new model in
+  `hermes delegation config`. Every role that uses the route follows it.
+- **One role only:** edit its line in `pstack-models.md`, or rerun
+  `/pstacky:setup-pstack` and change it at the confirm step.
+- **Back to the default:** delete the role's line.
+
+Route changes apply to new sessions. A role naming a route that no longer
+exists maps to the nearest route of the same family, else runs unrouted (the
+model map's default route, or the chat model) and says so.
 
 ## What is not shipped
 
