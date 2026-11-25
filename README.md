@@ -49,10 +49,14 @@ the chat's own model (`inherit-parent`).
 - **Routes** live in your Hermes config, under `advanced-delegation`'s model
   map: a name, a one-line description, a provider and a model.
 - **Roles** live in `$HERMES_HOME/pstack-models.md` (`~/.hermes` without a
-  profile): one line per role, each value a route name or `inherit-parent`.
+  profile): one line per role. A single-model role takes one value; a panel
+  role (`arena runners`, `interrogate reviewers`) and `arena cross-judge pool`
+  take a comma-separated list, one entry per seat or judge candidate. Each
+  value is a route name or `inherit-parent`.
 
-Without routes, every role runs on the chat model. Panels still fan out N
-subagents with different framings, and the cross-vendor judge is skipped.
+Without routes, every role runs on `delegation.model` when it is set, else on
+the chat model. Panels still fan out N subagents with different framings, and
+the cross-vendor judge is skipped.
 
 ### Upstream defaults, and what to pick instead
 
@@ -60,12 +64,14 @@ pstack (Cursor) ships three models, each with a job:
 
 | Job | Upstream default | Roles |
 | --- | --- | --- |
-| Main worker | Claude Opus 5.5 | feature, bug-fix, perf, hillclimb, judgment, swarm |
-| Second opinion | Claude Fable 5.2 | one panel seat in arena and interrogate |
-| Another vendor | Gemini 4 Neon | one panel seat, and the arena judge |
+| Main worker | Claude Opus 5.5 | feature, bug-fix, perf, hillclimb, judgment, swarm; a panel seat; first judge candidate |
+| Second opinion | Claude Fable 5.2 | a panel seat in arena and interrogate |
+| Another vendor | Gemini 4 Neon | a panel seat; second judge candidate |
 
 The model names matter less than the jobs: panels want different points of view,
-and the judge must come from a different vendor than the chat model. Pick the
+and the judge must come from a different vendor than the chat model. Arena takes
+the first judge candidate that qualifies, so with a Claude chat model Gemini
+judges. Pick the
 equivalents you have. Some examples, not recommendations:
 
 | Provider | Main worker | Second opinion | Another vendor |
@@ -79,12 +85,14 @@ equivalents you have. Some examples, not recommendations:
 1. `hermes plugins install advanced-delegation --enable`.
 2. `hermes delegation config` in a shell, mode Model routes. Add one route per
    model, cheapest first, each with a one-line description of what it is good
-   at. `<family>-<effort>` names (`deepseek-xhigh`, `kimi-high`) let pstack's
-   defaults map on their own; give two different models two different names,
-   not the same family with different efforts.
-3. A new session, then `/pstacky:setup-pstack`. It maps the defaults, suggests a
-   route for every role left on `inherit-parent`, and writes the role file only
-   with your yes. It can do steps 1 and 2 for you if you ask.
+   at. Use `<family>-<effort>` names (`opus-xhigh`, `deepseek-xhigh`,
+   `kimi-high`), and give two different models two different names, not the
+   same family with different efforts.
+3. A new session, then `/pstacky:setup-pstack`. Routes of the default families
+   (`opus`, `fable`, `gemini`) map on their own. Any other route (`deepseek-*`,
+   `kimi-*`, `sol-*`, ...) is only suggested for the roles left on
+   `inherit-parent`, and you confirm each one. The role file is written only
+   with your yes. setup-pstack can do steps 1 and 2 for you if you ask.
 
 ### Change a model later
 
