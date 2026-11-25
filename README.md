@@ -11,7 +11,7 @@ MIT, © Lauren Tan. See `NOTICE`.
 ## Install
 
 ```sh
-hermes plugins install <owner>/pstacky --enable
+hermes plugins install Trisert/pstacky --enable
 ```
 
 Skills land in the plugin namespace: `/pstacky:poteto-mode`,
