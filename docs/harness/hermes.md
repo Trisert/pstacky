@@ -107,14 +107,47 @@ Panels larger than `delegation.max_concurrent_children` run in batches.
 - Defaults. Routed: map each default slug to a route; a family with no route
   becomes `inherit-parent`, and you say which. Single-model: every value is
   `inherit-parent`.
-- Budget. Ask with `clarify`. Routed: move each value's effort to the nearest
-  route of its family. Names with no effort token do not move.
-- Write `$HERMES_HOME/pstack-models.md` with the `# defaults: 3` line, the
-  `# budget` line and one line per role, each value a route name or
-  `inherit-parent`. Overwrite the whole file. Never write these lines into a
-  project's `AGENTS.md`.
+- Suggest, never substitute. pstack's defaults name Anthropic and Google
+  families only, so a user whose routes are all other families (GPT only,
+  DeepSeek, Kimi, GLM) gets `inherit-parent` everywhere. At the confirm step,
+  for every role left on `inherit-parent` while routes exist, propose one route
+  from the route descriptions: a worker or implementation route for
+  implementation, bug-fix, hillclimb and swarm roles; a reasoning or review
+  route for perf-issue, judgment and prose; distinct routes per panel seat when
+  there are enough. Mark each one `suggested`, say why in a few words, and write
+  it only if the user accepts. Without an answer (cron, one-shot), keep
+  `inherit-parent`.
+- No routes in this session. The schema has no `option`, but that only means
+  `model_map` is not the active backend: routes can still be saved. Read
+  `hermes config get delegation.backend` and
+  `hermes config get delegation.backends.model_map.options --json` first.
+  - Saved routes exist: name them and offer to activate them with
+    `hermes config set delegation.backend model_map`. Change nothing else.
+  - None saved: say that per-role models need routes, and how to add them:
+    1. `hermes plugins install advanced-delegation --enable` (official catalog).
+    2. `hermes delegation config` in a shell, mode Model routes, one route per
+       model, ordered cheapest to strongest, each with a one-line description.
+       Names follow `<family>-<effort>` (`sol-xhigh`, `deepseek-high`) so the
+       defaults map on their own.
+    3. A new session, then `/pstacky:setup-pstack` again.
+
+    Offer to do steps 1 and 2. Only on a yes: install the plugin, then add
+    each route by reading the stored list, appending the new entries and
+    writing the whole list back with `hermes config set
+    delegation.backends.model_map.options '<json list>'`, and set
+    `hermes config set delegation.backend model_map`. Use provider and model
+    ids the user named or that the provider's model list shows are available;
+    never invent an id. Never remove or replace a stored route, and never
+    change `delegation.backends.model_map.default`, without a separate yes.
+    Read the list back and show it.
+  - In every case, leave an existing `$HERMES_HOME/pstack-models.md`
+    unchanged: a role that names a route this session lacks is still a valid
+    choice for a routed session. Write the file only when none exists, every
+    value `inherit-parent`. After activating or adding routes, stop: routes
+    apply to new sessions, so say to rerun setup-pstack there, where the saved
+    choices are checked at the normal confirm step.
 - Never install a plugin, add routes, or change `delegation.*` or any Hermes
-  config without asking the user.
+  config without the user's yes in this run.
 
 ## Frontmatter and paths
 
