@@ -115,24 +115,18 @@ You run it once. The role file it writes is used by every later session; rerun
 it only to change your choices.
 
 ```mermaid
-flowchart TD
-    A["/pstacky:setup-pstack"] --> B{"Routes active<br/>in this session?"}
-    B -- yes --> R["Your routes"]
-    B -- no --> I{"Routes saved<br/>in config?"}
-    I -- yes --> J{"Activate them?"}
-    I -- no --> K{"Add routes now?<br/>(installs advanced-delegation)"}
-    J -- yes --> R
-    K -- yes --> R
-    J -- no --> O["Keep pstack-models.md;<br/>write all inherit-parent<br/>only if none exists"]
-    K -- no --> O
-    R --> C["Read pstack-models.md<br/>as current choices"]
-    C --> D["Ask the budget"]
-    D --> E["Map routes named for<br/>pstack's default families"]
-    E --> F["Suggest your routes for roles<br/>still on inherit-parent;<br/>a different route per panel seat"]
-    F --> G{"You confirm<br/>or change roles"}
-    G --> H["Write pstack-models.md"]
-    H --> Z["Used by every later session"]
+flowchart LR
+    A["/pstacky:setup-pstack"] --> R{"Routes in<br/>your config?"}
+    R -- none --> K{"Add some now?"}
+    K -- no --> O["Every role on inherit-parent<br/>(existing file kept)"]
+    K -- yes --> P
+    R -- yes --> P["Propose a route per role:<br/>keep saved choices,<br/>suggest the rest"]
+    P --> G{"You confirm<br/>or change"}
+    G --> H["Write pstack-models.md<br/>(and activate routes if off)"]
 ```
+
+It asks for a budget only when one model has routes at several efforts; with one
+route per model there is nothing for a budget to move.
 
 setup-pstack never changes your config or installs anything without your yes,
 and never invents a model id.
