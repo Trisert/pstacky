@@ -130,7 +130,7 @@ Panels larger than `delegation.max_concurrent_children` run in batches.
        Name each route after the model it runs, then its effort
        (`deepseek-xhigh`, `kimi-high`); never name a route for a family it
        does not run.
-    3. A new session, then `/pstacky:setup-pstack` again.
+    3. `/pstacky:setup-pstack` (once routes exist it maps them in the same run).
 
     Offer to do steps 1 and 2. Only on a yes: install the plugin, then add
     each route by reading the stored list, appending the new entries and
@@ -141,12 +141,15 @@ Panels larger than `delegation.max_concurrent_children` run in batches.
     never invent an id. Never remove or replace a stored route, and never
     change `delegation.backends.model_map.default`, without a separate yes.
     Read the list back and show it.
-  - In every case, leave an existing `$HERMES_HOME/pstack-models.md`
-    unchanged: a role that names a route this session lacks is still a valid
-    choice for a routed session. Write the file only when none exists, every
-    value `inherit-parent`. After activating or adding routes, stop: routes
-    apply to new sessions, so say to rerun setup-pstack there, where the saved
-    choices are checked at the normal confirm step.
+  - Routes activated or added in this run: continue in the same run. The
+    list you read back is the detected route set; run Budget, the mapping,
+    the suggestions and the confirm step on it as in a routed session, and
+    check the saved role choices against it. Say once that the routes and the
+    role file take effect in sessions started after this one, with no rerun.
+  - The user declines: leave an existing `$HERMES_HOME/pstack-models.md`
+    unchanged, since a role that names a route this session lacks is still a
+    valid choice once routes are active. Write the file only when none
+    exists, every value `inherit-parent`.
 - Budget. Ask with `clarify`. Routed: use the highest-effort route of each
   value's family at or below its budget target. If none qualifies, mark the
   value as needing a choice. Names with no effort token do not move.

@@ -88,11 +88,12 @@ equivalents you have. Some examples, not recommendations:
    what it is good at. Name a route after the model it runs, then its effort
    (`deepseek-xhigh`, `kimi-high`, `sol-high`). Give two different models two
    different names, not the same family with different efforts.
-3. A new session, then `/pstacky:setup-pstack`. For every role still on
+3. Run `/pstacky:setup-pstack` once. For every role still on
    `inherit-parent` it suggests one of your routes, based on the descriptions;
    for a panel (arena runners, interrogate reviewers) it suggests a different
-   route per seat when you have enough. You confirm or change each one. The role file is written only with your
-   yes. setup-pstack can do steps 1 and 2 for you if you ask.
+   route per seat when you have enough. You confirm or change each one. The
+   role file is written only with your yes. setup-pstack can do steps 1 and 2
+   for you in the same run if you ask.
 
 You do not need Claude or Gemini. Only if you already run them: a route named
 for its family (`opus-*`, `fable-*`, `gemini-*`) is mapped to that model's
@@ -110,25 +111,27 @@ your main worker.
 
 ### How setup-pstack decides
 
+You run it once. The role file it writes is used by every later session; rerun
+it only to change your choices.
+
 ```mermaid
 flowchart TD
     A["/pstacky:setup-pstack"] --> B{"Routes active<br/>in this session?"}
-    B -- yes --> C["Read pstack-models.md<br/>as current choices"]
+    B -- yes --> R["Your routes"]
+    B -- no --> I{"Routes saved<br/>in config?"}
+    I -- yes --> J{"Activate them?"}
+    I -- no --> K{"Add routes now?<br/>(installs advanced-delegation)"}
+    J -- yes --> R
+    K -- yes --> R
+    J -- no --> O["Keep pstack-models.md;<br/>write all inherit-parent<br/>only if none exists"]
+    K -- no --> O
+    R --> C["Read pstack-models.md<br/>as current choices"]
     C --> D["Ask the budget"]
-    D --> E["Map defaults:<br/>opus / fable / gemini routes map on their own"]
+    D --> E["Map routes named for<br/>pstack's default families"]
     E --> F["Suggest your routes for roles<br/>still on inherit-parent;<br/>a different route per panel seat"]
     F --> G{"You confirm<br/>or change roles"}
     G --> H["Write pstack-models.md"]
-    H --> Z["Applies to new sessions"]
-    B -- no --> I{"Routes saved<br/>in config?"}
-    I -- yes --> J["Offer to activate them<br/>(delegation.backend: model_map)"]
-    I -- no --> K["Explain how to add routes;<br/>offer to add them"]
-    J -- "you say yes" --> L["Activate, then stop"]
-    K -- "you say yes" --> M["Install advanced-delegation,<br/>append routes, activate, stop"]
-    L --> N["New session:<br/>run setup-pstack again"]
-    M --> N
-    J -- no --> O["Keep pstack-models.md;<br/>write all inherit-parent only if none exists"]
-    K -- no --> O
+    H --> Z["Used by every later session"]
 ```
 
 setup-pstack never changes your config or installs anything without your yes,
@@ -141,7 +144,7 @@ flowchart TD
     R["A skill spawns a subagent for a role"] --> L{"Line for the role<br/>in pstack-models.md?"}
     L -- "inherit-parent" --> P["Chat model"]
     L -- "route name" --> X{"Route active?"}
-    L -- "no line" --> D["Skill default<br/>(a Claude or Gemini model)"]
+    L -- "no line" --> D["The skill's built-in default"]
     D --> F{"Route of the same family?"}
     X -- yes --> U["Run on that route"]
     X -- no --> F
