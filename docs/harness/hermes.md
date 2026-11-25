@@ -127,8 +127,9 @@ Panels larger than `delegation.max_concurrent_children` run in batches.
     1. `hermes plugins install advanced-delegation --enable` (official catalog).
     2. `hermes delegation config` in a shell, mode Model routes, one route per
        model, ordered cheapest to strongest, each with a one-line description.
-       Names follow `<family>-<effort>` (`sol-xhigh`, `deepseek-high`) so the
-       defaults map on their own.
+       Name each route after the model it runs, then its effort
+       (`deepseek-xhigh`, `kimi-high`); never name a route for a family it
+       does not run.
     3. A new session, then `/pstacky:setup-pstack` again.
 
     Offer to do steps 1 and 2. Only on a yes: install the plugin, then add

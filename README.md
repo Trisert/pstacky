@@ -84,15 +84,25 @@ equivalents you have. Some examples, not recommendations:
 
 1. `hermes plugins install advanced-delegation --enable`.
 2. `hermes delegation config` in a shell, mode Model routes. Add one route per
-   model, cheapest first, each with a one-line description of what it is good
-   at. Use `<family>-<effort>` names (`opus-xhigh`, `deepseek-xhigh`,
-   `kimi-high`), and give two different models two different names, not the
-   same family with different efforts.
-3. A new session, then `/pstacky:setup-pstack`. Routes of the default families
-   (`opus`, `fable`, `gemini`) map on their own. Any other route (`deepseek-*`,
-   `kimi-*`, `sol-*`, ...) is only suggested for the roles left on
-   `inherit-parent`, and you confirm each one. The role file is written only
-   with your yes. setup-pstack can do steps 1 and 2 for you if you ask.
+   model you want to use, cheapest first, each with a one-line description of
+   what it is good at. Name a route after the model it runs, then its effort
+   (`deepseek-xhigh`, `kimi-high`, `sol-high`). Give two different models two
+   different names, not the same family with different efforts.
+3. A new session, then `/pstacky:setup-pstack`. For every role that has no
+   choice yet it suggests one of your routes, based on the descriptions, and
+   you confirm or change each one. The role file is written only with your
+   yes. setup-pstack can do steps 1 and 2 for you if you ask.
+
+You do not need Claude or Gemini. Only if you already run them: a route named
+for its family (`opus-*`, `fable-*`, `gemini-*`) is mapped to that model's
+default roles on its own, and you still confirm the table. Never name a route
+`opus-*` unless it runs Opus.
+
+The playbooks and agent files also name Claude models as defaults
+(`claude-opus-5-5-xhigh-fast` for code work, for example). They read your role
+line first, so a role in `pstack-models.md` always wins. A step with no role
+line, such as eval's dispatcher or poteto-agent's own default, runs on the model
+map's `default` route, else the chat model. Point `default` at your main worker.
 
 ### Change a model later
 
