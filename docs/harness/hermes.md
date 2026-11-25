@@ -140,6 +140,11 @@ enough: the role file is read by every later session.
      a reasoning or review route for perf-issue, judgment and prose; a
      different route per panel seat (arena runners, interrogate reviewers,
      arena cross-judge pool) when there are enough. Mark each one `suggested`.
+   When the budget was asked (step 3), apply its target to every concrete
+   route in the table, saved choices and panel entries included: keep the
+   family and the seat, and use that family's highest-effort route at or
+   below the target, else mark it as needing a choice. `inherit-parent`,
+   `auto` and route names with no effort token do not move.
    With no answer possible (cron, one-shot), suggested values stay
    `inherit-parent`.
 5. **One confirmation.** Show the table and ask with one `clarify`: accept, or
@@ -148,6 +153,10 @@ enough: the role file is read by every later session.
    delegation.backend model_map`. Never change
    `delegation.backends.model_map.default`, or remove or replace a stored
    route, without a separate yes.
+
+   Before writing, check every value and every list entry: it must be a
+   configured route name, `inherit-parent` or `auto`. If one is not, show it
+   with the available choices and ask again; never write an unknown name.
 6. **Write.** Overwrite `$HERMES_HOME/pstack-models.md` as plain text with no
    frontmatter (no `---` block, `description` or `alwaysApply`): these two
    comment lines, the `# defaults: 3` line, the `# budget` line, then one line
