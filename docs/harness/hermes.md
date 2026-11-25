@@ -146,8 +146,9 @@ Panels larger than `delegation.max_concurrent_children` run in batches.
     value `inherit-parent`. After activating or adding routes, stop: routes
     apply to new sessions, so say to rerun setup-pstack there, where the saved
     choices are checked at the normal confirm step.
-- Budget. Ask with `clarify`. Routed: move each value's effort to the nearest
-  route of its family. Names with no effort token do not move.
+- Budget. Ask with `clarify`. Routed: use the highest-effort route of each
+  value's family at or below its budget target. If none qualifies, mark the
+  value as needing a choice. Names with no effort token do not move.
 - Read state only from `$HERMES_HOME/pstack-models.md`. Never look for
   `~/.cursor/rules/pstack-models.mdc` or anything else under `~/.cursor/`.
 - Write `$HERMES_HOME/pstack-models.md` as plain text with no frontmatter:
