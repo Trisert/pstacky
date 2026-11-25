@@ -107,6 +107,33 @@ Panels larger than `delegation.max_concurrent_children` run in batches.
 - Defaults. Routed: map each default slug to a route; a family with no route
   becomes `inherit-parent`, and you say which. Single-model: every value is
   `inherit-parent`.
+- Suggest, never substitute. pstack's defaults name Anthropic and Google
+  families only, so a user whose routes are all other families (GPT only,
+  DeepSeek, Kimi, GLM) gets `inherit-parent` everywhere. At the confirm step,
+  for every role left on `inherit-parent` while routes exist, propose one route
+  from the route descriptions: a worker or implementation route for
+  implementation, bug-fix, hillclimb and swarm roles; a reasoning or review
+  route for perf-issue, judgment and prose; distinct routes per panel seat when
+  there are enough. Mark each one `suggested`, say why in a few words, and write
+  it only if the user accepts. Without an answer (cron, one-shot), keep
+  `inherit-parent`.
+- No routes. When the schema has no `option`, say that per-role models need
+  routes, and how to add them:
+  1. `hermes plugins install advanced-delegation --enable` (official catalog).
+  2. `hermes delegation config` in a shell, mode Model routes, one route per
+     model, ordered cheapest to strongest, each with a one-line description.
+     Names follow `<family>-<effort>` (`sol-xhigh`, `deepseek-high`) so the
+     defaults map on their own.
+  3. A new session, then `/pstacky:setup-pstack` again.
+
+  Offer to do steps 1 and 2 for the user. Only on a yes: install the plugin,
+  write each route with `hermes config set delegation.backends.model_map.options
+  '<json list>'` and `hermes config set delegation.backend model_map`, using
+  provider and model ids the user named or that the provider's model list shows
+  are available; never invent an id. Read the routes back with
+  `hermes config get delegation.backends.model_map.options --json` and show
+  them. Then stop: routes apply to new sessions, so this run writes every role
+  as `inherit-parent` and says to rerun setup-pstack.
 - Budget. Ask with `clarify`. Routed: move each value's effort to the nearest
   route of its family. Names with no effort token do not move.
 - Write `$HERMES_HOME/pstack-models.md` with the `# defaults: 3` line, the
@@ -114,7 +141,7 @@ Panels larger than `delegation.max_concurrent_children` run in batches.
   `inherit-parent`. Overwrite the whole file. Never write these lines into a
   project's `AGENTS.md`.
 - Never install a plugin, add routes, or change `delegation.*` or any Hermes
-  config without asking the user.
+  config without the user's yes in this run.
 
 ## Frontmatter and paths
 

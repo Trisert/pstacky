@@ -48,7 +48,13 @@ only a convention. A role whose family has no route becomes `inherit-parent`.
 `/pstacky:setup-pstack` writes the role file to `$HERMES_HOME/pstack-models.md`
 (`~/.hermes` without a profile).
 
-pstacky ships no model ids. Routes are yours to configure.
+pstacky ships no model ids, and `setup-pstack` never creates routes on its own.
+To add them: `hermes plugins install advanced-delegation --enable`, then
+`hermes delegation config` (mode Model routes) in a shell, then a new session and
+`/pstacky:setup-pstack`. Name routes `<family>-<effort>` so pstack's defaults map
+on their own; pstack's defaults name only Anthropic and Google families, so with
+other families `setup-pstack` suggests a route per role and writes it only when
+you accept. `setup-pstack` can do the first two steps for you if you say yes.
 
 ## What is not shipped
 
