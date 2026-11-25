@@ -11,8 +11,16 @@ MIT, © Lauren Tan. See `NOTICE`.
 ## Install
 
 ```sh
-hermes plugins install Trisert/pstacky --enable
+hermes plugins install Trisert/pstacky --enable --force
 ```
+
+`--force` is required. The install scanner blocks every community package with a
+caution verdict, and pstacky always gets one: upstream `statechart` ships test
+fixtures with invisible Unicode and dense string parsing, which the scanner reads
+as obfuscation. pstacky runs no code on install. Read the findings before you
+pass `--force`; `--force` applies to this one install only.
+
+Install into a profile with `hermes -p <profile> plugins install ...`.
 
 Skills land in the plugin namespace: `/pstacky:poteto-mode`,
 `/pstacky:interrogate`, `/pstacky:swarm`, `/pstacky:deslop`, and the rest.
@@ -37,18 +45,27 @@ framings, and the cross-vendor judge is skipped and reported.
 `delegate_task` gains an `option` enum. pstacky maps each pstack role to a route
 name. Names are arbitrary; `<family>-<effort>` (`opus-xhigh`, `deepseek-high`) is
 only a convention. A role whose family has no route becomes `inherit-parent`.
-`/pstacky:setup-pstack` writes the role file to `~/.hermes/pstack-models.md`.
+`/pstacky:setup-pstack` writes the role file to `$HERMES_HOME/pstack-models.md`
+(`~/.hermes` without a profile).
 
 pstacky ships no model ids. Routes are yours to configure.
 
 ## What is not shipped
 
-- `make-bot-ui`: it installs Tailscale with `curl | sudo sh`; the plugin
-  install scanner treats that as privilege escalation.
+- `make-bot-ui`: its Tailscale step pipes a downloaded installer into a root
+  shell, which the plugin install scanner treats as privilege escalation.
 - `automations/benny`, upstream `assets/`, `.cursor-plugin/`: Cursor-only.
 
-Upstream text is otherwise unchanged. The only edit is the adapter line after
-the first heading (or after frontmatter when a skill has no heading).
+Upstream text is otherwise unchanged. There are two kinds of edit:
+
+- The adapter line after the first heading (or after frontmatter when a skill
+  has no heading), in every skill except `deslop`.
+- Links. A relative link to a file pstacky does not ship (`make-bot-ui`,
+  `automations/benny`, `docs/harness/claude-code.md`) points at the pinned
+  GitHub copy, and `blob/main` links are pinned to the same commit. This touches
+  `poteto-help/SKILL.md` and guide pages 1, 7 and 9. In `poteto-help`, the
+  `../../README.md` link now opens this README, which is the right install
+  guide for Hermes.
 
 ## Layout
 

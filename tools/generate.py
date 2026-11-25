@@ -42,7 +42,7 @@ ADAPTER_LINE = (
 # Companion skill, shipped from cursor-team-kit at the same commit.
 DESLOP_PATH = "cursor-team-kit/skills/deslop"
 
-# Install-scanner verdict: `curl | sudo sh` reads as privilege escalation.
+# Install-scanner verdict: its root installer pipe reads as privilege escalation.
 # Both mature ports exclude it too.
 SKIP_SKILLS = {"make-bot-ui"}
 
