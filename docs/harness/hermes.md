@@ -28,7 +28,7 @@ hardcode `~/.hermes`.
 | `Shell`, a command | `terminal`. Long runs: `background: true` with `notify: true`. |
 | `StrReplace` | `patch`. New or fully rewritten files: `write_file` (read an existing file first). |
 | `WebFetch`, `WebSearch` | `web_extract`, `web_search`. JS or login: `browser_exec`. |
-| `Await` | Interactive sessions: children return as a new message between turns; end the turn with one status line and never poll. One-shot runs and cron: `delegate_task` waits and returns the results in the same call. |
+| `Await` | If `delegate_task` returned results inline, use them and continue in this turn. This includes orchestrator children, one-shot runs, cron, and inline gateway sessions. If it returned a background dispatch handle instead, end the turn with one status line and never poll; results arrive between turns. |
 
 `/deslop` in pstack text is the companion skill shipped here: load
 `pstacky:deslop`. Upstream keeps it in `cursor-team-kit`; pstacky includes it
