@@ -146,6 +146,22 @@ Panels larger than `delegation.max_concurrent_children` run in batches.
     value `inherit-parent`. After activating or adding routes, stop: routes
     apply to new sessions, so say to rerun setup-pstack there, where the saved
     choices are checked at the normal confirm step.
+- Budget. Ask with `clarify`. Routed: move each value's effort to the nearest
+  route of its family. Names with no effort token do not move.
+- Read state only from `$HERMES_HOME/pstack-models.md`. Never look for
+  `~/.cursor/rules/pstack-models.mdc` or anything else under `~/.cursor/`.
+- Write `$HERMES_HOME/pstack-models.md` as plain text with no frontmatter:
+  no `---` block, no `description`, no `alwaysApply`. Use these two comment
+  lines, then the `# defaults: 3` line, the `# budget` line and one line per
+  role, each value a route name or `inherit-parent`:
+
+  ```
+  # pstack model configuration. One line per role. Delete a line to fall back to the skill default.
+  # `inherit-parent` or `auto` as a value: the role runs on the parent chat model (omit `option` on delegate_task). Alias entries in a panel list still count toward its fan-out.
+  ```
+
+  Overwrite the whole file. Never write these lines into a project's
+  `AGENTS.md`.
 - Never install a plugin, add routes, or change `delegation.*` or any Hermes
   config without the user's yes in this run.
 
