@@ -104,6 +104,49 @@ line first, so a role in `pstack-models.md` always wins. A step with no role
 line, such as eval's dispatcher or poteto-agent's own default, runs on the model
 map's `default` route, else the chat model. Point `default` at your main worker.
 
+### How setup-pstack decides
+
+```mermaid
+flowchart TD
+    A["/pstacky:setup-pstack"] --> B{"Routes active<br/>in this session?"}
+    B -- yes --> C["Read pstack-models.md<br/>as current choices"]
+    C --> D["Ask the budget"]
+    D --> E["Map defaults:<br/>opus / fable / gemini routes map on their own"]
+    E --> F["Suggest one of your routes<br/>for each role with no choice yet"]
+    F --> G{"You confirm<br/>or change roles"}
+    G --> H["Write pstack-models.md"]
+    H --> Z["Applies to new sessions"]
+    B -- no --> I{"Routes saved<br/>in config?"}
+    I -- yes --> J["Offer to activate them<br/>(delegation.backend: model_map)"]
+    I -- no --> K["Explain how to add routes;<br/>offer to add them"]
+    J -- "you say yes" --> L["Activate, then stop"]
+    K -- "you say yes" --> M["Install advanced-delegation,<br/>append routes, activate, stop"]
+    L --> N["New session:<br/>run setup-pstack again"]
+    M --> N
+    J -- no --> O["Keep pstack-models.md;<br/>write all inherit-parent only if none exists"]
+    K -- no --> O
+```
+
+setup-pstack never changes your config or installs anything without your yes,
+and never invents a model id.
+
+### How a role picks its model
+
+```mermaid
+flowchart TD
+    R["A skill spawns a subagent for a role"] --> L{"Line for the role<br/>in pstack-models.md?"}
+    L -- "inherit-parent" --> P["Chat model"]
+    L -- "route name" --> X{"Route active?"}
+    L -- "no line" --> D["Skill default<br/>(a Claude or Gemini model)"]
+    D --> F{"Route of the same family?"}
+    X -- yes --> U["Run on that route"]
+    X -- no --> F
+    F -- yes --> U2["Nearest effort of that family"]
+    F -- no --> M{"model_map default set?"}
+    M -- yes --> DR["Default route"]
+    M -- no --> DM["delegation.model,<br/>else the chat model"]
+```
+
 ### Change a model later
 
 - **Same role, different model:** point the route at the new model in
