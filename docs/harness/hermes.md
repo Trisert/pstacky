@@ -88,7 +88,7 @@ enum; otherwise apply steps 1 to 4 to it.
 | Case | Routed | Single-model |
 | --- | --- | --- |
 | A panel (arena runners, interrogate reviewers) | One entry per seat, each on its route. Every two seats on the same model get distinct framings in `context` ("assume the design is wrong", "optimize for the reader"). Say each seat's route and whether the panel was single-vendor. | N children, one per seat, same model, distinct framings. Say the panel was single-vendor. |
-| The cross-vendor judge | The first pool entry whose route's provider differs from the parent's. If the provider is unclear, check `hermes delegation config --show` (it refuses to run inside the gateway; then ask the user to run it in a shell). No qualifying entry: skip the judge and say so. Never let the parent judge. | The rule cannot be met: skip the judge and say so; the parent still scores candidates. |
+| The cross-vendor judge | The first pool entry whose route's model vendor (the lab that trained it: Anthropic, OpenAI, Google, DeepSeek, Moonshot, ...) differs from the parent model's. Compare vendors, not the Hermes `provider`: one gateway such as `opencode-go` or `openrouter` serves many vendors. If the vendor is unclear from the route description, check `hermes delegation config --show` (it refuses to run inside the gateway; then ask the user to run it in a shell). No qualifying entry: skip the judge and say so. Never let the parent judge. | The rule cannot be met: skip the judge and say so; the parent still scores candidates. |
 
 After a routed batch, read each result's `route` and `fallback_activated`. A
 route that differs, or a fallback, is reported. A `route.refused` is a routing
