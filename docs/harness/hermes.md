@@ -173,8 +173,11 @@ Ignore the `~/.cursor/rules/pstack-models.mdc` path from upstream step 2 — rea
    each role's target to every concrete route in the table — saved choices,
    defaults, suggestions, and panel/pool entries alike: keep the family and the
    seat, and pick that family's highest-effort route at or below the role's
-   target, else mark it as needing a choice. `inherit-parent`, `auto`, and
-   route names with no effort token do not move.
+   target, else mark it as needing a choice. For panel roles (`arena runners`,
+   `interrogate reviewers`), when multiple seats share a family, pick distinct
+   routes within their targets where available and repeat a route only when
+   fewer distinct routes fit. `inherit-parent`, `auto`, and route names with
+   no effort token do not move.
 
    Otherwise do not ask: keep an existing file's `# budget` line, or write
    `# budget: large (xhigh)` when creating a new file.
