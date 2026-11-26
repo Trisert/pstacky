@@ -100,71 +100,115 @@ Panels larger than `delegation.max_concurrent_children` run in batches.
 
 ## setup-pstack
 
-- Detect. Routed: the detected models are the `option` enum with its
-  descriptions. Single-model: the session model and `delegation.model`
-  (`hermes config get delegation.model`). Say that per-role models need
-  `advanced-delegation`.
-- Defaults. Routed: map each default slug to a route; a family with no route
-  becomes `inherit-parent`, and you say which. Single-model: every value is
-  `inherit-parent`.
-- Suggest, never substitute. pstack's defaults name Anthropic and Google
-  families only, so a user whose routes are all other families (GPT only,
-  DeepSeek, Kimi, GLM) gets `inherit-parent` everywhere. At the confirm step,
-  for every role left on `inherit-parent` while routes exist, propose one route
-  from the route descriptions: a worker or implementation route for
-  implementation, bug-fix, hillclimb and swarm roles; a reasoning or review
-  route for perf-issue, judgment and prose; distinct routes per panel seat when
-  there are enough. Mark each one `suggested`, say why in a few words, and write
-  it only if the user accepts. Without an answer (cron, one-shot), keep
-  `inherit-parent`.
-- No routes in this session. The schema has no `option`, but that only means
-  `model_map` is not the active backend: routes can still be saved. Read
-  `hermes config get delegation.backend` and
-  `hermes config get delegation.backends.model_map.options --json` first.
-  - Saved routes exist: name them and offer to activate them with
-    `hermes config set delegation.backend model_map`. Change nothing else.
-  - None saved: say that per-role models need routes, and how to add them:
-    1. `hermes plugins install advanced-delegation --enable` (official catalog).
-    2. `hermes delegation config` in a shell, mode Model routes, one route per
-       model, ordered cheapest to strongest, each with a one-line description.
-       Names follow `<family>-<effort>` (`sol-xhigh`, `deepseek-high`) so the
-       defaults map on their own.
-    3. A new session, then `/pstacky:setup-pstack` again.
+In Hermes these steps replace setup-pstack's steps 1 to 5. Steps 6 to 8
+(confirm, then the optional verification skills) stay as written. One run is
+enough: the role file is read by every later session.
 
-    Offer to do steps 1 and 2. Only on a yes: install the plugin, then add
-    each route by reading the stored list, appending the new entries and
-    writing the whole list back with `hermes config set
-    delegation.backends.model_map.options '<json list>'`, and set
-    `hermes config set delegation.backend model_map`. Use provider and model
-    ids the user named or that the provider's model list shows are available;
-    never invent an id. Never remove or replace a stored route, and never
-    change `delegation.backends.model_map.default`, without a separate yes.
-    Read the list back and show it.
-  - In every case, leave an existing `$HERMES_HOME/pstack-models.md`
-    unchanged: a role that names a route this session lacks is still a valid
-    choice for a routed session. Write the file only when none exists, every
-    value `inherit-parent`. After activating or adding routes, stop: routes
-    apply to new sessions, so say to rerun setup-pstack there, where the saved
-    choices are checked at the normal confirm step.
-- Budget. Ask with `clarify`. Routed: use the highest-effort route of each
-  value's family at or below its budget target. If none qualifies, mark the
-  value as needing a choice. Names with no effort token do not move.
-- Read state only from `$HERMES_HOME/pstack-models.md`. Never look for
-  `~/.cursor/rules/pstack-models.mdc` or anything else under `~/.cursor/`.
-- Write `$HERMES_HOME/pstack-models.md` as plain text with no frontmatter:
-  no `---` block, no `description`, no `alwaysApply`. Use these two comment
-  lines, then the `# defaults: 3` line, the `# budget` line and one line per
-  role, each value a route name or `inherit-parent`:
+Ignore the `~/.cursor/rules/pstack-models.mdc` path from upstream step 2 — read
+`$HERMES_HOME/pstack-models.md` only, even in your first tool batch.
 
-  ```
-  # pstack model configuration. One line per role. Delete a line to fall back to the skill default.
-  # `inherit-parent` or `auto` as a value: the role runs on the parent chat model (omit `option` on delegate_task). Alias entries in a panel list still count toward its fan-out.
-  ```
+1. **Routes.** Read `hermes config get delegation.backends.model_map.options
+   --json` and `hermes config get delegation.backend`. The config is the source
+   of truth; when `model_map` is active the `option` enum shows the same list.
+   - Routes exist: go on, whether or not `model_map` is active.
+   - None: say that per-role models need routes, and offer to add them. Only
+     on a yes: `hermes plugins install advanced-delegation --enable` when it is
+     missing, then add each route by reading the stored list, appending the new
+     entries and writing the whole list back with `hermes config set
+     delegation.backends.model_map.options '<json list>'`. Use provider and
+     model ids the user named or that the provider's model list shows; never
+     invent an id. Name each route after the model it runs, then its effort
+     (`deepseek-xhigh`, `kimi-high`), cheapest first, each with a one-line
+     description; never name a route for a family it does not run. Read the
+     list back, show it, and go on with it.
+   - The user declines: leave an existing `$HERMES_HOME/pstack-models.md`
+     unchanged; when none exists, write one with every value
+     `inherit-parent`. Stop.
+2. **Current choices.** Read `$HERMES_HOME/pstack-models.md` only; never look
+   under `~/.cursor/`. Drop retired roles (`hardest tasks`, `architect
+   runners`, `reflect tooling`, `why investigators`). Do not run upstream's
+   Cursor-slug migrations (`gemini-4-*`, `grok-*`, `claude-*`) on Hermes route
+   names.
+3. **One proposal per role.** Build the working table in this order:
+   - `inherit-parent` and `auto` are never marked `route missing`. When the
+     existing file already uses at least one concrete route, saved
+     `inherit-parent` and `auto` choices stay as-is. When every role in the
+     existing file is `inherit-parent` (a placeholder written before routes
+     existed), treat those roles as unchosen so they receive suggestions from
+     the configured routes below (note that they were `inherit-parent`).
+   - a saved choice whose route still exists stays (subject to step 4 if a
+     budget is asked);
+   - a saved choice whose route is gone is shown as `route missing`, with a
+     replacement offered;
+   - a role with no choice gets the route of its default's family when one
+     exists (`opus-*`, `fable-*`, `gemini-*`, mapped as in Route names);
+   - every other role gets a suggestion from the route descriptions: a worker
+     or implementation route for implementation, bug-fix, hillclimb and swarm;
+     a reasoning or review route for perf-issue, judgment and prose; a
+     different route per panel seat for panel roles (`arena runners`,
+     `interrogate reviewers`) when there are enough; for `arena cross-judge
+     pool` (not a panel — Arena runs one judge at run time, picking the first
+     entry from a vendor other than the current chat model's), suggest an
+     ordered list spanning the available vendors, including the setup chat's
+     vendor, so switching chat vendors later still has an eligible judge. Mark
+     each suggestion `suggested`.
 
-  Overwrite the whole file. Never write these lines into a project's
-  `AGENTS.md`.
-- Never install a plugin, add routes, or change `delegation.*` or any Hermes
-  config without the user's yes in this run.
+   With no answer possible (cron, one-shot), suggested values stay
+   `inherit-parent`.
+4. **Budget, only when it can move a role.** Check the concrete routes in the
+   proposal from step 3 (saved choices, defaults, replacements and suggestions
+   alike). Ask with `clarify` only when at least one role in that proposal uses
+   a family that has two or more configured routes at different efforts. Offer
+   these three options with these exact labels, naming the current budget when
+   the file records one (or saying `large` matches the defaults when there is
+   no file):
+   - `large — xhigh reasoning`
+   - `medium — high reasoning`
+   - `small — medium reasoning`
+
+   On the ladder `xhigh > high > medium > low`, `large` keeps each role's
+   target effort (`xhigh` for single-model roles, `high` for `swarm workers`
+   and panel seats other than Gemini's `xhigh` seat), `medium` lowers each
+   target one step, and `small` lowers it two steps (clamped at `low`). Apply
+   each role's target to every concrete route in the table — saved choices,
+   defaults, suggestions, and panel/pool entries alike: keep the family and the
+   seat, and pick that family's highest-effort route at or below the role's
+   target, else mark it as needing a choice. For panel roles (`arena runners`,
+   `interrogate reviewers`), when multiple seats share a family, pick distinct
+   routes within their targets where available and repeat a route only when
+   fewer distinct routes fit. `inherit-parent`, `auto`, and route names with
+   no effort token do not move.
+
+   Otherwise do not ask: keep an existing file's `# budget` line, or write
+   `# budget: large (xhigh)` when creating a new file.
+5. **One confirmation.** Show the table and ask with one `clarify`: accept,
+   change named roles, or cancel.
+   - Cancel / no: write nothing, leave any existing
+     `$HERMES_HOME/pstack-models.md` unchanged, change no config, and stop.
+   - When `delegation.backend` is not `model_map`, the same question says that
+     accepting also runs `hermes config set delegation.backend model_map`. When
+     `delegation.backend` is already `model_map`, do not mention activating it.
+   - Never change `delegation.backends.model_map.default`, or remove or replace
+     a stored route, without a separate yes.
+
+   Before writing, check every value and every list entry: it must be a
+   configured route name, `inherit-parent` or `auto`. If one is not, show it
+   with the available choices and ask again; never write an unknown name.
+6. **Write.** Overwrite `$HERMES_HOME/pstack-models.md` as plain text with no
+   frontmatter (no `---` block, `description` or `alwaysApply`): these two
+   comment lines, the `# defaults: 3` line, the `# budget` line, then one line
+   per role, each value a route name, `inherit-parent` or `auto`.
+
+   ```
+   # pstack model configuration. One line per role. Delete a line to fall back to the skill default.
+   # `inherit-parent` or `auto` as a value: the role runs on the parent chat model (omit `option` on delegate_task). Alias entries in a panel list still count toward its fan-out.
+   ```
+
+   Never write these lines into a project's `AGENTS.md`. Say once that routes
+   and roles take effect in sessions started after this one, with no rerun.
+
+Never install a plugin, add routes, or change `delegation.*` or any Hermes
+config without the user's yes in this run.
 
 ## Frontmatter and paths
 

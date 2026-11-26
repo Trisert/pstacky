@@ -52,7 +52,7 @@ the chat's own model (`inherit-parent`).
   profile): one line per role. A single-model role takes one value; a panel
   role (`arena runners`, `interrogate reviewers`) and `arena cross-judge pool`
   take a comma-separated list, one entry per seat or judge candidate. Each
-  value is a route name or `inherit-parent`.
+  value is a route name, `inherit-parent` or `auto`.
 
 Without routes, every role runs on `delegation.model` when it is set, else on
 the chat model. Panels still fan out N subagents with different framings, and
@@ -84,15 +84,71 @@ equivalents you have. Some examples, not recommendations:
 
 1. `hermes plugins install advanced-delegation --enable`.
 2. `hermes delegation config` in a shell, mode Model routes. Add one route per
-   model, cheapest first, each with a one-line description of what it is good
-   at. Use `<family>-<effort>` names (`opus-xhigh`, `deepseek-xhigh`,
-   `kimi-high`), and give two different models two different names, not the
-   same family with different efforts.
-3. A new session, then `/pstacky:setup-pstack`. Routes of the default families
-   (`opus`, `fable`, `gemini`) map on their own. Any other route (`deepseek-*`,
-   `kimi-*`, `sol-*`, ...) is only suggested for the roles left on
-   `inherit-parent`, and you confirm each one. The role file is written only
-   with your yes. setup-pstack can do steps 1 and 2 for you if you ask.
+   model you want to use, cheapest first, each with a one-line description of
+   what it is good at. Name a route after the model it runs, then its effort
+   (`deepseek-xhigh`, `kimi-high`, `sol-high`). Give two different models two
+   different names, not the same family with different efforts.
+3. Run `/pstacky:setup-pstack` once. For every role still on
+   `inherit-parent` it suggests one of your routes, based on the descriptions;
+   for a panel (arena runners, interrogate reviewers) it suggests a different
+   route per seat when you have enough. You confirm the table or change named
+   roles. The
+   role file is written only with your yes. setup-pstack can do steps 1 and 2
+   for you in the same run if you ask.
+
+You do not need Claude or Gemini. Only if you already run them: a route named
+for its family (`opus-*`, `fable-*`, `gemini-*`) is mapped to that model's
+default roles on its own, and you still confirm the table. Never name a route
+`opus-*` unless it runs Opus.
+
+The playbooks and agent files also name Claude models as defaults
+(`claude-opus-5-5-xhigh-fast` for code work, for example). They read your role
+line first, so a role in `pstack-models.md` always wins. A step with no role
+line, such as eval's dispatcher or poteto-agent's own default, keeps its Claude
+default: it runs on a route of that family if you have one (`opus-medium` for
+eval's dispatcher), else on the model map's `default` route when `model_map` is
+active (else the chat model; without `model_map`, `delegation.model` or the
+chat model). Without Claude routes, point `default` at your main worker.
+
+### How setup-pstack decides
+
+You run it once. The role file it writes is used by every later session; rerun
+it only to change your choices.
+
+```mermaid
+flowchart LR
+    A["/pstacky:setup-pstack"] --> R{"Routes in<br/>your config?"}
+    R -- none --> K{"Add some now?"}
+    K -- no --> O["Keep existing file;<br/>else write all inherit-parent"]
+    K -- yes --> P
+    R -- yes --> P["Propose a route per role<br/>(ask budget only if a family<br/>has several efforts)"]
+    P --> G{"Confirm,<br/>change, or cancel"}
+    G -- yes --> H["Write pstack-models.md<br/>(activate routes if off)"]
+    G -- cancel --> X["Write nothing"]
+```
+
+It asks for a budget only when one model has routes at several efforts; with one
+route per model there is nothing for a budget to move.
+
+setup-pstack never changes your config or installs anything without your yes,
+and never invents a model id.
+
+### How a role picks its model
+
+```mermaid
+flowchart TD
+    R["A skill spawns a subagent for a role"] --> L{"Line for the role<br/>in pstack-models.md?"}
+    L -- "inherit-parent" --> P["Chat model"]
+    L -- "route name" --> X{"Route active?"}
+    L -- "no line" --> D["The skill's built-in default"]
+    D --> F{"Route of the same family?"}
+    X -- yes --> U["Run on that route"]
+    X -- no --> F
+    F -- yes --> U2["Nearest effort of that family"]
+    F -- no --> M{"model_map active<br/>with default set?"}
+    M -- yes --> DR["Default route"]
+    M -- no --> DM["Chat model<br/>(or delegation.model<br/>without model_map)"]
+```
 
 ### Change a model later
 
