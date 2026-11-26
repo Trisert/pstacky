@@ -129,25 +129,15 @@ Ignore the `~/.cursor/rules/pstack-models.mdc` path from upstream step 2 — rea
    runners`, `reflect tooling`, `why investigators`). Do not run upstream's
    Cursor-slug migrations (`gemini-4-*`, `grok-*`, `claude-*`) on Hermes route
    names.
-3. **Budget, only when it can move a role.** Ask with `clarify` only when at
-   least one role (a saved choice or a mapped default) uses a family that has
-   two or more configured routes at different efforts. Offer these three
-   options with these exact labels, naming the current budget when the file
-   records one (or saying `large` matches the defaults when there is no file):
-   - `large — xhigh reasoning`
-   - `medium — high reasoning`
-   - `small — medium reasoning`
-
-   On the ladder `xhigh > high > medium > low`, `large` keeps each role's
-   target effort (`xhigh` for single-model roles, `high` for `swarm workers`
-   and panel seats other than Gemini's `xhigh` seat), `medium` lowers each
-   target one step, and `small` lowers it two steps (clamped at `low`).
-   Otherwise do not ask: keep an existing file's `# budget` line, or write
-   `# budget: large (xhigh)` when creating a new file.
-4. **One proposal per role.** Build the table in this order:
-   - `inherit-parent` and `auto` are always valid saved choices and stay as-is;
-   - a saved choice whose route still exists stays (subject to the budget
-     step below if asked);
+3. **One proposal per role.** Build the working table in this order:
+   - `inherit-parent` and `auto` are never marked `route missing`. When the
+     existing file already uses at least one concrete route, saved
+     `inherit-parent` and `auto` choices stay as-is. When every role in the
+     existing file is `inherit-parent` (a placeholder written before routes
+     existed), treat those roles as unchosen so they receive suggestions from
+     the configured routes below (note that they were `inherit-parent`).
+   - a saved choice whose route still exists stays (subject to step 4 if a
+     budget is asked);
    - a saved choice whose route is gone is shown as `route missing`, with a
      replacement offered;
    - a role with no choice gets the route of its default's family when one
@@ -157,18 +147,37 @@ Ignore the `~/.cursor/rules/pstack-models.mdc` path from upstream step 2 — rea
      a reasoning or review route for perf-issue, judgment and prose; a
      different route per panel seat for panel roles (`arena runners`,
      `interrogate reviewers`) when there are enough; for `arena cross-judge
-     pool` (not a panel — Arena runs one judge, the first candidate from a
-     vendor other than the parent's), suggest candidates from vendors other
-     than the parent's in preference order. Mark each suggestion `suggested`.
+     pool` (not a panel — Arena runs one judge at run time, picking the first
+     entry from a vendor other than the current chat model's), suggest an
+     ordered list spanning the available vendors, including the setup chat's
+     vendor, so switching chat vendors later still has an eligible judge. Mark
+     each suggestion `suggested`.
 
-   If step 3 asked for a budget, apply each role's target effort to every
-   concrete route in the table — saved choices, defaults, and panel/pool
-   entries alike: keep the family and the seat, and pick that family's
-   highest-effort route at or below the role's target, else mark it as needing
-   a choice. `inherit-parent`, `auto`, and route names with no effort token do
-   not move.
    With no answer possible (cron, one-shot), suggested values stay
    `inherit-parent`.
+4. **Budget, only when it can move a role.** Check the concrete routes in the
+   proposal from step 3 (saved choices, defaults, replacements and suggestions
+   alike). Ask with `clarify` only when at least one role in that proposal uses
+   a family that has two or more configured routes at different efforts. Offer
+   these three options with these exact labels, naming the current budget when
+   the file records one (or saying `large` matches the defaults when there is
+   no file):
+   - `large — xhigh reasoning`
+   - `medium — high reasoning`
+   - `small — medium reasoning`
+
+   On the ladder `xhigh > high > medium > low`, `large` keeps each role's
+   target effort (`xhigh` for single-model roles, `high` for `swarm workers`
+   and panel seats other than Gemini's `xhigh` seat), `medium` lowers each
+   target one step, and `small` lowers it two steps (clamped at `low`). Apply
+   each role's target to every concrete route in the table — saved choices,
+   defaults, suggestions, and panel/pool entries alike: keep the family and the
+   seat, and pick that family's highest-effort route at or below the role's
+   target, else mark it as needing a choice. `inherit-parent`, `auto`, and
+   route names with no effort token do not move.
+
+   Otherwise do not ask: keep an existing file's `# budget` line, or write
+   `# budget: large (xhigh)` when creating a new file.
 5. **One confirmation.** Show the table and ask with one `clarify`: accept,
    change named roles, or cancel.
    - Cancel / no: write nothing, leave any existing
