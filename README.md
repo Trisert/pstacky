@@ -52,7 +52,7 @@ the chat's own model (`inherit-parent`).
   profile): one line per role. A single-model role takes one value; a panel
   role (`arena runners`, `interrogate reviewers`) and `arena cross-judge pool`
   take a comma-separated list, one entry per seat or judge candidate. Each
-  value is a route name or `inherit-parent`.
+  value is a route name, `inherit-parent` or `auto`.
 
 Without routes, every role runs on `delegation.model` when it is set, else on
 the chat model. Panels still fan out N subagents with different framings, and
@@ -91,7 +91,8 @@ equivalents you have. Some examples, not recommendations:
 3. Run `/pstacky:setup-pstack` once. For every role still on
    `inherit-parent` it suggests one of your routes, based on the descriptions;
    for a panel (arena runners, interrogate reviewers) it suggests a different
-   route per seat when you have enough. You confirm or change each one. The
+   route per seat when you have enough. You confirm the table or change named
+   roles. The
    role file is written only with your yes. setup-pstack can do steps 1 and 2
    for you in the same run if you ask.
 
@@ -105,9 +106,9 @@ The playbooks and agent files also name Claude models as defaults
 line first, so a role in `pstack-models.md` always wins. A step with no role
 line, such as eval's dispatcher or poteto-agent's own default, keeps its Claude
 default: it runs on a route of that family if you have one (`opus-medium` for
-eval's dispatcher), else on the model map's `default` route, else on
-`delegation.model` or the chat model. Without Claude routes, point `default` at
-your main worker.
+eval's dispatcher), else on the model map's `default` route when `model_map` is
+active (else the chat model; without `model_map`, `delegation.model` or the
+chat model). Without Claude routes, point `default` at your main worker.
 
 ### How setup-pstack decides
 
@@ -118,11 +119,12 @@ it only to change your choices.
 flowchart LR
     A["/pstacky:setup-pstack"] --> R{"Routes in<br/>your config?"}
     R -- none --> K{"Add some now?"}
-    K -- no --> O["Every role on inherit-parent<br/>(existing file kept)"]
+    K -- no --> O["Keep existing file;<br/>else write all inherit-parent"]
     K -- yes --> P
-    R -- yes --> P["Propose a route per role:<br/>keep saved choices,<br/>suggest the rest"]
-    P --> G{"You confirm<br/>or change"}
-    G --> H["Write pstack-models.md<br/>(and activate routes if off)"]
+    R -- yes --> P["Propose a route per role<br/>(ask budget only if a family<br/>has several efforts)"]
+    P --> G{"Confirm,<br/>change, or cancel"}
+    G -- yes --> H["Write pstack-models.md<br/>(activate routes if off)"]
+    G -- cancel --> X["Write nothing"]
 ```
 
 It asks for a budget only when one model has routes at several efforts; with one
@@ -143,9 +145,9 @@ flowchart TD
     X -- yes --> U["Run on that route"]
     X -- no --> F
     F -- yes --> U2["Nearest effort of that family"]
-    F -- no --> M{"model_map default set?"}
+    F -- no --> M{"model_map active<br/>with default set?"}
     M -- yes --> DR["Default route"]
-    M -- no --> DM["delegation.model,<br/>else the chat model"]
+    M -- no --> DM["Chat model<br/>(or delegation.model<br/>without model_map)"]
 ```
 
 ### Change a model later

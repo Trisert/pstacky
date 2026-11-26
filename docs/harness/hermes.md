@@ -104,6 +104,9 @@ In Hermes these steps replace setup-pstack's steps 1 to 5. Steps 6 to 8
 (confirm, then the optional verification skills) stay as written. One run is
 enough: the role file is read by every later session.
 
+Ignore the `~/.cursor/rules/pstack-models.mdc` path from upstream step 2 — read
+`$HERMES_HOME/pstack-models.md` only, even in your first tool batch.
+
 1. **Routes.** Read `hermes config get delegation.backends.model_map.options
    --json` and `hermes config get delegation.backend`. The config is the source
    of truth; when `model_map` is active the `option` enum shows the same list.
@@ -122,37 +125,59 @@ enough: the role file is read by every later session.
      unchanged; when none exists, write one with every value
      `inherit-parent`. Stop.
 2. **Current choices.** Read `$HERMES_HOME/pstack-models.md` only; never look
-   under `~/.cursor/`. Drop retired roles and migrate an older
-   file as setup-pstack's step 2 says.
-3. **Budget, only when it can change something.** Ask with `clarify` only when
-   one family has two or more routes at different efforts. Then each role uses
-   that family's highest-effort route at or below its target, else it needs a
-   choice. Otherwise do not ask: keep the file's `# budget` line, or write
-   `large (xhigh)` when there is none.
-4. **One proposal per role.** In this order:
-   - a saved choice whose route still exists stays;
+   under `~/.cursor/`. Drop retired roles (`hardest tasks`, `architect
+   runners`, `reflect tooling`, `why investigators`). Do not run upstream's
+   Cursor-slug migrations (`gemini-4-*`, `grok-*`, `claude-*`) on Hermes route
+   names.
+3. **Budget, only when it can move a role.** Ask with `clarify` only when at
+   least one role (a saved choice or a mapped default) uses a family that has
+   two or more configured routes at different efforts. Offer these three
+   options with these exact labels, naming the current budget when the file
+   records one (or saying `large` matches the defaults when there is no file):
+   - `large — xhigh reasoning`
+   - `medium — high reasoning`
+   - `small — medium reasoning`
+
+   On the ladder `xhigh > high > medium > low`, `large` keeps each role's
+   target effort (`xhigh` for single-model roles, `high` for `swarm workers`
+   and panel seats other than Gemini's `xhigh` seat), `medium` lowers each
+   target one step, and `small` lowers it two steps (clamped at `low`).
+   Otherwise do not ask: keep an existing file's `# budget` line, or write
+   `# budget: large (xhigh)` when creating a new file.
+4. **One proposal per role.** Build the table in this order:
+   - `inherit-parent` and `auto` are always valid saved choices and stay as-is;
+   - a saved choice whose route still exists stays (subject to the budget
+     step below if asked);
    - a saved choice whose route is gone is shown as `route missing`, with a
      replacement offered;
    - a role with no choice gets the route of its default's family when one
      exists (`opus-*`, `fable-*`, `gemini-*`, mapped as in Route names);
-   - every other role gets one suggested route from the descriptions: a worker
+   - every other role gets a suggestion from the route descriptions: a worker
      or implementation route for implementation, bug-fix, hillclimb and swarm;
      a reasoning or review route for perf-issue, judgment and prose; a
-     different route per panel seat (arena runners, interrogate reviewers,
-     arena cross-judge pool) when there are enough. Mark each one `suggested`.
-   When the budget was asked (step 3), apply its target to every concrete
-   route in the table, saved choices and panel entries included: keep the
-   family and the seat, and use that family's highest-effort route at or
-   below the target, else mark it as needing a choice. `inherit-parent`,
-   `auto` and route names with no effort token do not move.
+     different route per panel seat for panel roles (`arena runners`,
+     `interrogate reviewers`) when there are enough; for `arena cross-judge
+     pool` (not a panel — Arena runs one judge, the first candidate from a
+     vendor other than the parent's), suggest candidates from vendors other
+     than the parent's in preference order. Mark each suggestion `suggested`.
+
+   If step 3 asked for a budget, apply each role's target effort to every
+   concrete route in the table — saved choices, defaults, and panel/pool
+   entries alike: keep the family and the seat, and pick that family's
+   highest-effort route at or below the role's target, else mark it as needing
+   a choice. `inherit-parent`, `auto`, and route names with no effort token do
+   not move.
    With no answer possible (cron, one-shot), suggested values stay
    `inherit-parent`.
-5. **One confirmation.** Show the table and ask with one `clarify`: accept, or
-   change named roles. When `delegation.backend` is not `model_map`, the same
-   question says that accepting also runs `hermes config set
-   delegation.backend model_map`. Never change
-   `delegation.backends.model_map.default`, or remove or replace a stored
-   route, without a separate yes.
+5. **One confirmation.** Show the table and ask with one `clarify`: accept,
+   change named roles, or cancel.
+   - Cancel / no: write nothing, leave any existing
+     `$HERMES_HOME/pstack-models.md` unchanged, change no config, and stop.
+   - When `delegation.backend` is not `model_map`, the same question says that
+     accepting also runs `hermes config set delegation.backend model_map`. When
+     `delegation.backend` is already `model_map`, do not mention activating it.
+   - Never change `delegation.backends.model_map.default`, or remove or replace
+     a stored route, without a separate yes.
 
    Before writing, check every value and every list entry: it must be a
    configured route name, `inherit-parent` or `auto`. If one is not, show it
@@ -160,7 +185,7 @@ enough: the role file is read by every later session.
 6. **Write.** Overwrite `$HERMES_HOME/pstack-models.md` as plain text with no
    frontmatter (no `---` block, `description` or `alwaysApply`): these two
    comment lines, the `# defaults: 3` line, the `# budget` line, then one line
-   per role, each value a route name or `inherit-parent`.
+   per role, each value a route name, `inherit-parent` or `auto`.
 
    ```
    # pstack model configuration. One line per role. Delete a line to fall back to the skill default.
